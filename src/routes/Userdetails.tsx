@@ -34,9 +34,11 @@ interface Person {
   lastname: string;
   password: string;
   email: string;
-  amount: number;
+country: string;
+phone:string;
   uid: string;
-  ssn?: string;
+  totaldeposits:number;
+  currentprofits:number;
 }
 interface Transactions extends Transaction{
     _id:string
@@ -55,7 +57,8 @@ export default function Userdetails() {
 
   const [user, setUser] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [amount, setAmount] = useState<number>();
+  const [currentAmount, setCurrentAmount] = useState<number>();
+  const [depositAmount, setDepositAmount] = useState<number>();
   const [success1, setSuccess1] = useState<string>();
   const [success2, setSuccess2] = useState<string>();
   const [success3, setSuccess3] = useState<string>();
@@ -103,17 +106,38 @@ export default function Userdetails() {
       setSuccess2("");
     }
   };
-  const changeAmount = (e: FormEvent<HTMLFormElement>) => {
+  const changeCurrentAmount = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (amount === null || amount === undefined) {
+    if (currentAmount === null || currentAmount === undefined) {
       throw Error("please fill in the amount");
       setError1("Please fill in the amount");
       setSuccess1(undefined);
     }
     const docref = doc(db, "UserInfo", userId);
 
-    updateDoc(docref, { amount: amount })
+    updateDoc(docref, { currentprofits: currentAmount })
+      .then(() => {
+        setError1("");
+
+        setSuccess1("Successfully changed the amount");
+      })
+      .catch((err: any) => {
+        console.log(err);
+        setError1(err.message);
+      });
+  };
+  const changeDepositAmount = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (depositAmount === null || depositAmount === undefined) {
+      throw Error("please fill in the amount");
+      setError1("Please fill in the amount");
+      setSuccess1(undefined);
+    }
+    const docref = doc(db, "UserInfo", userId);
+
+    updateDoc(docref, { totaldeposits: depositAmount })
       .then(() => {
         setError1("");
 
@@ -184,7 +208,7 @@ export default function Userdetails() {
       ) : (
         <>
           <nav className="bg-blue-500 p-1 text-white">
-            <header className="text-center font-bold">CRYPTNETVERSE</header>
+            <header className="text-center font-bold">ELITE TRADING HUB</header>
           </nav>
 
           {error1 && <div className="text-red-500">{error1}</div>}
@@ -207,7 +231,7 @@ export default function Userdetails() {
               <span className="font-semibold">Email:</span> {user?.email}
             </p>
             <p>
-              <span className="font-semibold">SSN:</span> {user?.ssn}
+              <span className="font-semibold">Phone:</span> {user?.phone}
             </p>
             <p>
               <span className="font-semibold">Password: </span>
@@ -220,13 +244,13 @@ export default function Userdetails() {
             </p>
 
             <p>
-              <span className="font-semibold">Amount: </span>
-              {user?.amount}
+              <span className="font-semibold">Current Profits: </span>
+              {user?.currentprofits}
             </p>
 
-            <form onSubmit={changeAmount} className="mb-4 ">
+            <form onSubmit={changeCurrentAmount} className="mb-4 ">
               <Input
-                onChange={(e) => setAmount(parseFloat(e.target.value))}
+                onChange={(e) => setCurrentAmount(parseFloat(e.target.value))}
                 type="number"
                 className="w-3/5 mb-3"
               />
@@ -235,7 +259,26 @@ export default function Userdetails() {
                 type="submit"
                 className="rounded cursor-pointer bg-blue-500 p-2 text-md text-white"
               >
-                Change Amount
+                Change Current Profits
+              </button>
+            </form>
+            <p>
+              <span className="font-semibold">Current Profits: </span>
+              {user?.totaldeposits}
+            </p>
+
+            <form onSubmit={changeDepositAmount} className="mb-4 ">
+              <Input
+                onChange={(e) => setDepositAmount(parseFloat(e.target.value))}
+                type="number"
+                className="w-3/5 mb-3"
+              />
+
+              <button
+                type="submit"
+                className="rounded cursor-pointer bg-blue-500 p-2 text-md text-white"
+              >
+                Change Deposit
               </button>
             </form>
           </main>
