@@ -48,9 +48,9 @@ export default function LoginPage() {
   return (
     <>
       <nav className="p-1 font-bold">
-        <header className="text-center">CRYPTONETVERSE</header>
+        <header className="text-center">Elite Trading Hub</header>
       </nav>
-      <main className="text-center bg-blue-700 text-white h-svh py-10">
+      <main className="text-center  text-white h-svh py-10">
         <form
           onSubmit={handleSubmit}
           className="md:border w-4/5 md:w-2/5 mx-center mx-auto  h-4/5 py-12 px-5 rounded-lg bg-white text-black"
