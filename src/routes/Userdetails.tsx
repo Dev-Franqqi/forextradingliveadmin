@@ -37,6 +37,7 @@ interface Person {
 country: string;
 phone:string;
   uid: string;
+  investment:string
   totaldeposits:number;
   currentprofits:number;
 }
@@ -236,6 +237,11 @@ export default function Userdetails() {
             <p>
               <span className="font-semibold">Password: </span>
               {user?.password}
+            </p>
+            <p>
+            <span className="font-semibold">Password: </span>
+              {user?.investment}
+              
             </p>
 
             <p>
