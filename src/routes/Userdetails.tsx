@@ -239,8 +239,13 @@ export default function Userdetails() {
               {user?.password}
             </p>
             <p>
-            <span className="font-semibold">Password: </span>
+            <span className="font-semibold">Investment: </span>
               {user?.investment}
+              
+            </p>
+            <p>
+            <span className="font-semibold">Country: </span>
+              {user?.country}
               
             </p>
 
