@@ -274,7 +274,7 @@ export default function Userdetails() {
               </button>
             </form>
             <p>
-              <span className="font-semibold">Current Profits: </span>
+              <span className="font-semibold">Deposits: </span>
               {user?.totaldeposits}
             </p>
 
