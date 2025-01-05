@@ -65,7 +65,7 @@ function UsersPage() {
   return (
     <>
       <nav className=" flex justify-between px-3 py-2 mb-2 bg-gray-200 ">
-        <header className=" font-bold text-center">ELITE TRADING HUB</header>
+        <header className=" font-bold text-center">FOREX TRADING LIVE</header>
         {/* <div className="hover:underline">
           <a href="https://console.firebase.google.com/u/0/project/tonye-project/firestore/data/~2FUserInfo~2F87MKUstd1rnFMV038KLq">
             View Database

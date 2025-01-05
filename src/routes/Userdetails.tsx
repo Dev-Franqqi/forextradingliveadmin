@@ -209,7 +209,7 @@ export default function Userdetails() {
       ) : (
         <>
           <nav className="bg-blue-500 p-1 text-white">
-            <header className="text-center font-bold">ELITE TRADING HUB</header>
+            <header className="text-center font-bold">FOREX TRADING LIVE</header>
           </nav>
 
           {error1 && <div className="text-red-500">{error1}</div>}

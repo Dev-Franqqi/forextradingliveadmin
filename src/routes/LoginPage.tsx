@@ -48,7 +48,7 @@ export default function LoginPage() {
   return (
     <>
       <nav className="p-1 font-bold">
-        <header className="text-center">Elite Trading Hub</header>
+        <header className="text-center">FOREX TRADING LIVE</header>
       </nav>
       <main className="text-center  text-white h-svh py-10">
         <form
