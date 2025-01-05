@@ -27,7 +27,7 @@ export default function LoginPage() {
     }
 
     // Corrected condition for username and password
-    if (!(username === "elitetradinghub" && password === "asap123")) {
+    if (!(username === "forextradinglive" && password === "Agbawo27")) {
       setError(true);
       setErrorMessage("Incorrect Email or Password");
       setLoading(false);
