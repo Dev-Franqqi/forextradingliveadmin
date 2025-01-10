@@ -250,7 +250,8 @@ export default function Userdetails() {
           <section className="px-5 py-8">
             <div className="flex justify-between mb-5">
               <h2 className=" font-bold">Transactions</h2>
-             <TransactionForm />
+              {user?.uid? <TransactionForm uid={user?.uid} />: "no user id"}
+             
             </div>
             {loading ? (
               <div>Loading...</div>

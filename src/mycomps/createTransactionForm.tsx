@@ -3,12 +3,13 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 import { Input } from '@/components/ui/input'; // Adjust imports based on your libraries
 import { Button } from '@/components/ui/button'; // Adjust imports based on your libraries
 import { createTransactionInFirebase } from './createTransactionInFirebase'; // Adjust path based on where your firebase transaction function is
-const TransactionForm = () => {
+const TransactionForm = ({uid}:{uid:string}) => {
   const [name, setName] = useState('');
   const [type, setType] = useState('');
   const [date, setDate] = useState('');
   const [tAmount, setTamount] = useState('');
   const [error2, setError2] = useState('');
+
   const [success2, setSuccess2] = useState('');
 
   const createATransaction = async (e:any) => {
@@ -27,6 +28,7 @@ const TransactionForm = () => {
         type,
         tamount: parseInt(tAmount, 10),
         date, // Current date in YYYY-MM-DD format
+        docref:uid
       });
 
       setSuccess2('Transaction successfully created!');

@@ -5,7 +5,8 @@ export type TR ={
     name:string,
     type:string,
     tamount:number,
-    date:string
+    date:string,
+    docref:string
    }
 
 export const createTransactionInFirebase = async (transaction:TR) => {
@@ -16,6 +17,7 @@ export const createTransactionInFirebase = async (transaction:TR) => {
       type: transaction.type,
       tamount: transaction.tamount,
       date: transaction.date,
+      docref:transaction.docref
     });
   } catch (error) {
     console.error("Error adding transaction: ", error);
