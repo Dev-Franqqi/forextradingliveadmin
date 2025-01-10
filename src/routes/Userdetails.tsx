@@ -2,33 +2,21 @@ import { useState, useEffect,FormEvent } from "react";
 import { getDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import createTransaction from "@/utils/createTransaction";
-import { Transaction } from "@/utils/createTransaction";
+import { getDocs } from "firebase/firestore";
 import { db } from "@/components/firebase";
-import getTransaction from "@/utils/getTransaction";
-import deleteTransaction from "@/utils/deleteTransaction";
+import { query } from "firebase/firestore";
+import { where } from "firebase/firestore";
+import { collection } from "firebase/firestore";
+import TransactionForm from "@/mycomps/createTransactionForm";
 
+export type TR ={
+  name:string,
+  type:string,
+  tamount:number,
+  date:string,
+  docref:string
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-
+ }
 interface Person {
   firstname: string;
   lastname: string;
@@ -40,9 +28,6 @@ phone:string;
   investment:string
   totaldeposits:number;
   currentprofits:number;
-}
-interface Transactions extends Transaction{
-    _id:string
 }
 
 
@@ -61,52 +46,11 @@ export default function Userdetails() {
   const [currentAmount, setCurrentAmount] = useState<number>();
   const [depositAmount, setDepositAmount] = useState<number>();
   const [success1, setSuccess1] = useState<string>();
-  const [success2, setSuccess2] = useState<string>();
-  const [success3, setSuccess3] = useState<string>();
-  const [transaction, setTransaction] = useState<Transactions[]>();
+  const [transactions, setTransactions] = useState<TR[]>();
   const [error1, setError1] = useState<string>();
-  const [error2, setError2] = useState<string>();
-  const [error3, setError3] = useState<string>();
-  const [email, setEmail] = useState<string>("");
-  const [transactionType, setTransactionType] = useState<string>("");
-  const [transactionDetail, setTransactionDetail] = useState<string>("");
-  const [transactionAmount, setTransactionAmount] = useState<number>(0);
   
-     const deleteATransaction = async (e: React.MouseEvent<SVGElement>) => {
-       const id: string =
-         (e.target as HTMLElement)?.getAttribute("aria-describedby") || "";
-
-       console.log(id);
-       try {
-           await deleteTransaction(id);
-           setError3('')
-
-         setSuccess3("Successfully deleted transaction");
-       } catch (error: any) {
-           setSuccess3('')
-           setError3(error.message);
-           
-       }
-  };
-  
-  const createATransaction = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError2("");
-
-    try {
-      await createTransaction({
-        email,
-        transactionType,
-        transactionDetail,
-        transactionAmount,
-      });
-      setError2("");
-      setSuccess2("Successfully created transaction");
-    } catch (error: any) {
-      setError2(error.message);
-      setSuccess2("");
-    }
-  };
+    
+ 
   const changeCurrentAmount = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -159,15 +103,7 @@ export default function Userdetails() {
   };
 
   const fetchTransaction = async () => {
-    try {
-      if (user && user.email) {
-        const res = await getTransaction(user.email);
-        setTransaction(res);
-        console.log(res); // Log the response instead of the state directly
-      }
-    } catch (error: any) {
-      setError3(error.message);
-    }
+    
   };
 
   
@@ -195,12 +131,33 @@ export default function Userdetails() {
     };
 
     fetchData();
+    if (user) {
+      const q = query(
+          collection(db, "transactions"),
+          where("docref", "==", user.uid) // Use user.uid directly, no need for template literals
+      );
+  
+      
+          getDocs(q)
+              .then(snapshot => {
+                  const transactions = snapshot.docs.map(doc => doc.data() as TR);
+                  setTransactions(transactions); // Set all matching transactions
+                  console.log("Matching transactions:", transactions);
+              })
+              .catch(error => {
+                  console.error("Error fetching transactions:", error);
+              })
+              .finally(() => {
+                  setLoading(false); // Ensure loading is set to false regardless of success or error
+              });
+      
+  }
     if (loading === false) {
       fetchTransaction();
     }
 
    
-  }, [userId, loading]);
+  }, [userId, loading,transactions]);
 
   return (
     <>
@@ -214,7 +171,7 @@ export default function Userdetails() {
 
           {error1 && <div className="text-red-500">{error1}</div>}
           {success1 && <div className="text-green-600">{success1}</div>}
-          <main className="p-6 bg-white">
+          <main className="p-6 bg-white md:w-3/5 md:justify-between md:mx-auto">
             <h1 className="text-2xl font-bold">
               {user?.firstname} {user?.lastname}
             </h1>
@@ -238,11 +195,7 @@ export default function Userdetails() {
               <span className="font-semibold">Password: </span>
               {user?.password}
             </p>
-            <p>
-            <span className="font-semibold">Investment: </span>
-              {user?.investment}
-              
-            </p>
+           
             <p>
             <span className="font-semibold">Country: </span>
               {user?.country}
@@ -297,109 +250,35 @@ export default function Userdetails() {
           <section className="px-5 py-8">
             <div className="flex justify-between mb-5">
               <h2 className=" font-bold">Transactions</h2>
-              <Sheet>
-                <SheetTrigger className="text-blue-500">
-                  Add Transaction
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Create New Transaction</SheetTitle>
-                    <SheetDescription>Complete all Fields</SheetDescription>
-                  </SheetHeader>
-
-                  <form
-                    className="mb-4 pt-10 flex flex-col gap-y-5"
-                    onSubmit={createATransaction}
-                  >
-                    {error2 && <div className="text-red-500">{error2}</div>}
-                    {success2 && <div className="text-green-600">{success2}</div>}
-                    <Input
-                      placeholder="Email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Deposit or Withdrawal"
-                      type="text"
-                      value={transactionType}
-                      onChange={(e) => setTransactionType(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Transaction Detail"
-                      type="text"
-                      value={transactionDetail}
-                      onChange={(e) => setTransactionDetail(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Transaction Amount"
-                      type=""
-                      value={transactionAmount}
-                      onChange={(e) =>
-                        setTransactionAmount(parseInt(e.target.value))
-                      }
-                    />
-                    <Button>Submit</Button>
-                  </form>
-                </SheetContent>
-              </Sheet>
+             <TransactionForm />
             </div>
             {loading ? (
               <div>Loading...</div>
             ) : (
               <div>
-                {error3 && (
-                  <div className="text-red-500 text-center">{error3}</div>
-                )}
-                {success3 && <div className="text-green-600">{success3}</div>}
+               
               </div>
             )}
-            <Table>
-              <TableCaption>A list of your recent invoices.</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">Invoice</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Detail</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {transaction?.map((invoice: Transactions, index: number) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">
-                      {index + 1}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                        aria-describedby={invoice._id}
-                        onClick={deleteATransaction}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                        />
-                      </svg>
-                    </TableCell>
-                    <TableCell>{invoice.transactionType}</TableCell>
-                    <TableCell>{invoice.transactionDetail}</TableCell>
-                    <TableCell
-                      className={
-                        "text-right font-bold"
-                  
-                      }
-                    >
-                      ${invoice.transactionAmount}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+             <div className="p-4 bg-gray-800 text-white">
+      <h2 className="text-lg font-bold mb-4">Transactions</h2>
+      <div className="border-t border-yellow-500 mb-4"></div>
+      {transactions ? transactions.map((transaction, index) => (
+        <div key={index} className="flex justify-between items-center py-4 border-b border-gray-700">
+          <div>
+            <h3 className="text-sm font-semibold">{transaction.name}</h3>
+            <p className="text-xs text-gray-400">{transaction.type}</p>
+            <p className="text-xs text-gray-400 mt-1">{transaction.date}</p>
+          </div>
+          <div
+            className={`text-sm font-bold px-3 py-1 rounded ${
+              transaction.tamount < 0 ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
+            }`}
+          >
+            {transaction.tamount.toString()}
+          </div>
+        </div>
+      )):<p>No Transactions Yet</p>}
+    </div>
           </section>
         </>
       )}
